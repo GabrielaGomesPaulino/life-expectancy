@@ -1,10 +1,9 @@
 "Cleaning data file"
-import pandas as pd
 import argparse
+import pandas as pd
 
 # pylint: disable=line-too-long
 def clean_data(region:str):
-   
     """Method to clean data """
     # read data from file
     life_expectancy_df = pd.read_csv(
@@ -39,11 +38,10 @@ def split_column_unpivot(lf_exp: pd):
 def filter_df_data(dataframe : pd,
                     region : str= 'PT'):
     """Filter dataframe data types"""
- 
-    filter_value_column_df = dataframe[dataframe["value"].str.contains(":")==False]
+    filter_value_column_df = dataframe[dataframe["value"].str.contains(":") is False]
     filter_region = filter_value_column_df[(filter_value_column_df['region'] == region)]
-    filter_value_letters = filter_region[filter_region['value'].str.contains('[A-Za-z]',regex=True)==False]
-    
+    filter_value_letters = filter_region[filter_region['value'].str.contains('[A-Za-z]',regex=True) is False]
+
     return filter_value_letters
 
 def convert_data_types(filtered_dataframe : pd):
@@ -67,5 +65,5 @@ if __name__ == "__main__":
 
     # Parse the argument
     args = parser.parse_args()
- 
+
     clean_data(args.region)
