@@ -1,9 +1,10 @@
 name: python-course 
 
-on: [push]
+on: 
+    push:
+      branches: [main,ci]
     pull_request:
-      branches:
-      - main
+      branches: [main]
 
 jobs:
   build:
