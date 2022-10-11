@@ -1,6 +1,13 @@
 name: python-course 
 
-on: [push, pull_request]
+on:
+  push:
+    branches:    
+      - main
+  pull_request:
+    # Sequence of patterns matched against refs/heads
+    branches:    
+      - main
 
 jobs:
   build:
