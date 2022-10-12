@@ -1,5 +1,7 @@
+"""Test file"""
 import pandas as pd
 
+# pylint: disable=line-too-long
 def test_clean_data() -> None:
     """Test data """
     """actual_df = pd.read_csv("/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/life_expectancy/data/pt_life_expectancy.csv")
