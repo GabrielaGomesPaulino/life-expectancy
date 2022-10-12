@@ -3,60 +3,42 @@ import pandas as pd
 import argparse
 
 # pylint: disable=line-too-long
-def clean_data(region:str):
-   
+def clean_data(life_expectancy_df:pd,
+        region:str):
     """Method to clean data """
+
+    # split column and add new columns to df
+    life_expectancy_df[['unit','sex','age','region']] = life_expectancy_df['unit,sex,age,region'].str.split(',', expand=True)
+    life_expectancy_df = life_expectancy_df.drop('unit,sex,age,region', axis=1)
+    life_expectancy_df = life_expectancy_df.melt(id_vars=['unit','sex','age','region'], var_name='year', value_name='value')
+
+    #filter data
+    filtered_value_column_df = life_expectancy_df[life_expectancy_df["value"].str.contains(":")==False]
+    filtered_region = filtered_value_column_df[(filtered_value_column_df['region'] == region)]
+    filtered_value_letters = filtered_region[filtered_region['value'].str.contains('[A-Za-z]',regex=True)==False]
+
+    #convert data types
+    filtered_value_letters[['year']] = filtered_value_letters[['year']].astype(int)
+    filtered_value_letters[['value']] = filtered_value_letters[['value']].astype(float)
+
+    #upload dataframe to data folder
+    save_data(filtered_value_letters)
+
+def load_data(region:str):
+    """Method to load data """
+
     # read data from file
     life_expectancy_df = pd.read_csv(
-'/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/life_expectancy/data/eu_life_expectancy_raw.tsv',
+'/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/python-course/life_expectancy/data/eu_life_expectancy_raw.tsv',
         sep='\t')
     life_expectancy_df.rename(
         columns = {'unit,sex,age,geo\\time': 'unit,sex,age,region'}, inplace = True)
-
-    # split column and add new columns to df
-    life_expectancy_df = split_column_unpivot(life_expectancy_df)
-
-    #filter data
-    filtered_dataframe = filter_df_data(life_expectancy_df,region)
-
-    #convert data types
-    converted_df = convert_data_types(filtered_dataframe)
-
-    #upload dataframe to data folder
-    upload_df_path(converted_df,'/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/life_expectancy/data/pt_life_expectancy.csv')
-
-    return converted_df
-
-def split_column_unpivot(lf_exp: pd):
-    """Unpivot dataframe columns"""
-    lf_exp[['unit','sex','age','region']
-    ] = lf_exp['unit,sex,age,region'].str.split(',', expand=True)
-    lf_exp = lf_exp.drop('unit,sex,age,region', axis=1)
-    lf_exp = lf_exp.melt(id_vars=['unit','sex','age','region'], var_name='year', value_name='value')
-
-    return lf_exp
-
-def filter_df_data(dataframe : pd,
-                    region : str= 'PT'):
-    """Filter dataframe data types"""
- 
-    filter_value_column_df = dataframe[dataframe["value"].str.contains(":")==False]
-    filter_region = filter_value_column_df[(filter_value_column_df['region'] == region)]
-    filter_value_letters = filter_region[filter_region['value'].str.contains('[A-Za-z]',regex=True)==False]
     
-    return filter_value_letters
+    clean_data(life_expectancy_df,region)
 
-def convert_data_types(filtered_dataframe : pd):
-    """Convert dataframe data tyoes"""
-    filtered_dataframe[['year']] = filtered_dataframe[['year']].astype(int)
-    filtered_dataframe[['value']] = filtered_dataframe[['value']].astype(float)
-
-    return filtered_dataframe
-
-def upload_df_path(converted_df : pd,
-                   path : str):
+def save_data(dataframe:pd):
     """Upload dataframe to path"""
-    converted_df.to_csv(path, index = False)
+    dataframe.to_csv('/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/python-course/life_expectancy/data/pt_life_expectancy.csv', index = False)
 
 if __name__ == "__main__":
     # Create the parser
@@ -69,3 +51,4 @@ if __name__ == "__main__":
     args = parser.parse_args()
  
     clean_data(args.region)
+    
