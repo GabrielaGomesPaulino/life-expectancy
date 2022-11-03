@@ -1,12 +1,20 @@
 "Cleaning data file"
 import pandas as pd
 import argparse
+from pathlib import Path
 
 # pylint: disable=line-too-long
-def clean_data(life_expectancy_df:pd,
-        region:str):
+def clean_data(life_expectancy_df,region:str):
     """Method to clean data """
 
+    #load data from path
+    #life_expectancy_df = load_data(Path.cwd()/'data/eu_life_expectancy_raw.tsv')
+    
+
+    #rename columns
+    life_expectancy_df.rename(
+        columns = {'unit,sex,age,geo\\time': 'unit,sex,age,region'}, inplace = True)
+    
     # split column and add new columns to df
     life_expectancy_df[['unit','sex','age','region']] = life_expectancy_df['unit,sex,age,region'].str.split(',', expand=True)
     life_expectancy_df = life_expectancy_df.drop('unit,sex,age,region', axis=1)
@@ -23,22 +31,23 @@ def clean_data(life_expectancy_df:pd,
 
     #upload dataframe to data folder
     save_data(filtered_value_letters)
+    
+    return filtered_value_letters
 
-def load_data(region:str):
+def load_data(path):
     """Method to load data """
 
     # read data from file
-    life_expectancy_df = pd.read_csv(
-'/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/python-course/life_expectancy/data/eu_life_expectancy_raw.tsv',
-        sep='\t')
-    life_expectancy_df.rename(
-        columns = {'unit,sex,age,geo\\time': 'unit,sex,age,region'}, inplace = True)
+    life_expectancy_df = pd.read_csv(path,sep='\t')
     
-    clean_data(life_expectancy_df,region)
+
+    return life_expectancy_df
 
 def save_data(dataframe:pd):
     """Upload dataframe to path"""
-    dataframe.to_csv('/Users/gabrielapaulino/Assignment1/life_expectancy2/env/bin/python-course/life_expectancy/data/pt_life_expectancy.csv', index = False)
+    #dataframe.to_csv(Path.cwd()/'data/pt_life_expectancy.csv', index = False)
+
+    return "Success"
 
 if __name__ == "__main__":
     # Create the parser
@@ -51,4 +60,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
  
     clean_data(args.region)
-    
